@@ -99,11 +99,18 @@ class ProductOfRedNodesVisitor extends TreeVis {
     }
 
     public void visitNode(TreeNode node) {
-        if (node.getColor() == Color.RED) multi *= node.getValue();
+        if (node.getColor() == Color.RED)
+        {
+            multi *= node.getValue();
+            System.out.println(node.getValue() + " " + multi);
+        }
     }
 
     public void visitLeaf(TreeLeaf leaf) {
-        if (leaf.getColor() == Color.RED) multi *= leaf.getValue();
+        if (leaf.getColor() == Color.RED) {
+            multi *= leaf.getValue();
+            System.out.println(leaf.getValue() + " " + multi);
+        }
     }
 }
 
@@ -125,7 +132,6 @@ class FancyVisitor extends TreeVis {
 }
 
 public class Solution {
-
     public static Tree solve() {
         //read the tree from STDIN and return its root as a return value of this function
         ArrayList<Integer> values = new ArrayList<>();
@@ -143,6 +149,11 @@ public class Solution {
         scan.nextLine();
         for (int i = 0; i < size - 1; i++) {
             connections.add(scan.nextLine().split(" "));
+            if (connections.stream().filter(con -> connections.get(connections.size() - 1)[1].equals(con[1])).count() > 1){
+                String change = connections.get(connections.size() - 1)[0];
+                connections.get(connections.size() - 1)[0] = connections.get(connections.size() - 1)[1];
+                connections.get(connections.size() - 1)[1] = change;
+            }
         }
         for (int i = 0; i < size; i++) {
             int depth = 0;
@@ -158,10 +169,9 @@ public class Solution {
                 depth += 1;
             }
             int Finalcheck = i + 1;
-            if (connections.stream()
-                    .mapToInt(con -> Integer.parseInt(con[0]))
-                    .filter(con -> con == Finalcheck)
-                    .findFirst()
+            if ((filtered = connections.stream()
+                    .filter(con -> Integer.parseInt(con[0]) == Finalcheck)
+                    .findAny())
                     .isPresent()) {
                 nodes.add(new TreeNode(values.get(i).intValue(),
                         Color.values()[colors.get(i).intValue()], depth));
@@ -173,10 +183,6 @@ public class Solution {
         connections.forEach(con -> {
             ((TreeNode) nodes.get(Integer.parseInt(con[0]) - 1)).addChild(nodes.get(Integer.parseInt(con[1]) - 1));
         });
-        for (int i = 1; i <= size; i++){
-            System.out.println(i + " " + nodes.get(i - 1).getValue() + " " + nodes.get(i - 1).getClass() + " " + nodes.get(i - 1).getDepth());
-        }
-        System.out.println(nodes.stream().filter(node -> node.getClass() == TreeLeaf.class).mapToInt(x -> x.getValue()).sum());
         return nodes.get(0);
     }
 
